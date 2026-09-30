@@ -1,0 +1,95 @@
+import pandas as pd
+from sklearn.datasets import load_iris
+
+# Load Iris dataset
+iris = load_iris()
+
+# Create a DataFrame
+df = pd.DataFrame(iris.data, columns=iris.feature_names)
+
+# Add the flower species
+df["species"] = iris.target_names[iris.target]
+
+# Display the first 5 rows
+print("First 5 rows of the Iris dataset:")
+print(df.head())
+
+# Display dataset information
+print("\nDataset shape:")
+print(df.shape)
+
+print("\nSpecies count:")
+print(df["species"].value_counts())
+
+# Check for missing values
+print("\nMissing values:")
+print(df.isnull().sum())
+from sklearn.model_selection import train_test_split
+from sklearn.neighbors import KNeighborsClassifier
+from sklearn.metrics import accuracy_score
+
+# Separate input features and target
+X = iris.data
+y = iris.target
+
+# Split data into training and testing sets
+X_train, X_test, y_train, y_test = train_test_split(
+    X, y, test_size=0.2, random_state=42
+)
+
+# Create the machine learning model
+model = KNeighborsClassifier(n_neighbors=3)
+
+# Train the model
+model.fit(X_train, y_train)
+
+# Make predictions
+y_pred = model.predict(X_test)
+
+# Check accuracy
+accuracy = accuracy_score(y_test, y_pred)
+
+print("\nModel Accuracy:", accuracy)
+print("Model Accuracy (%):", accuracy * 100)
+import matplotlib.pyplot as plt
+
+# Scatter plot of sepal measurements
+plt.figure(figsize=(8, 5))
+
+for species in iris.target_names:
+    plt.scatter(
+        df[df["species"] == species]["sepal length (cm)"],
+        df[df["species"] == species]["sepal width (cm)"],
+        label=species
+    )
+
+plt.xlabel("Sepal Length (cm)")
+plt.ylabel("Sepal Width (cm)")
+plt.title("Iris Flower Classification")
+plt.legend()
+plt.show()
+from sklearn.metrics import confusion_matrix, classification_report
+import matplotlib.pyplot as plt
+
+# Confusion Matrix
+cm = confusion_matrix(y_test, y_pred)
+
+plt.figure(figsize=(6, 5))
+plt.imshow(cm)
+plt.title("Confusion Matrix")
+plt.xlabel("Predicted Label")
+plt.ylabel("Actual Label")
+plt.colorbar()
+
+plt.xticks([0, 1, 2], iris.target_names) 
+plt.yticks([0, 1, 2], iris.target_names)
+
+for i in range(3):
+    for j in range(3):
+        plt.text(j, i, cm[i, j], ha="center", va="center")
+
+plt.show()
+
+# Classification Report
+print("\nClassification Report:")
+print(classification_report(y_test, y_pred, target_names=iris.target_names))
